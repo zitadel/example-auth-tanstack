@@ -4,6 +4,7 @@ import {
 } from '@tanstack/react-router';
 import { Meta, Scripts } from '@tanstack/react-start';
 import React from 'react';
+import '../app.css';
 
 export const Route = createRootRoute({
   head: () => ({
