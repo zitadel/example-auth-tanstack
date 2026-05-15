@@ -22,7 +22,7 @@
     "@auth/core": "^0.40.0",
     "@tanstack/react-router": "^1.0.0",
     "@tanstack/react-start": "^1.0.0",
-    "@zitadel/tanstack-start-auth": "^0.1.0",
+    "@zitadel/tanstack-auth": "^0.1.0",
     "openid-client": "^6.6.2",
     "react": "^19",
     "react-dom": "^19",
