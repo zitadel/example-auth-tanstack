@@ -1,4 +1,4 @@
-import { TanStackAuth } from '@zitadel/tanstack-start-auth';
+import { TanStackAuth } from '@zitadel/tanstack-auth';
 import Zitadel from '@auth/core/providers/zitadel';
 import { randomUUID } from 'crypto';
 import * as oidc from 'openid-client';
