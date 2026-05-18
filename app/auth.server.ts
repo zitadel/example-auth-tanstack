@@ -70,7 +70,7 @@ declare module '@auth/core/jwt' {
   }
 }
 
-export const { handlers, getSession, auth } = TanStackAuth({
+export const { handlers, getSession, signIn, signOut } = TanStackAuth({
   providers: [
     Zitadel({
       issuer: process.env.ZITADEL_DOMAIN!,

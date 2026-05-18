@@ -5,6 +5,8 @@ node_modules
 /dist
 /build
 /out
+/.vinxi
+/.output
 
 # Version control directories
 .git
@@ -15,6 +17,9 @@ node_modules
 # Other common directories to ignore
 /public
 /assets
+
+# Generated Vinxi/TanStack build artifacts
+app.config.timestamp_*.js
 
 # Minified files
 *.min.*
