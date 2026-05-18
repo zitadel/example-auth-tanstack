@@ -92,9 +92,9 @@ Follow these steps to get the application running:
 
 ```bash
 # 1. Clone the repository
-git clone git@github.com:zitadel/example-tanstack-start-auth.git
+git clone git@github.com:zitadel/example-auth-tanstack-start.git
 
-cd example-tanstack-start-auth
+cd example-auth-tanstack-start
 
 # 2. Install the project dependencies
 npm install

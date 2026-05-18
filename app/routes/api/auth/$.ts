@@ -1,3 +1,4 @@
+// noinspection JSUnusedGlobalSymbols
 import { handlers } from '~/auth.server';
 import { createAPIFileRoute } from '@tanstack/react-start/api';
 
