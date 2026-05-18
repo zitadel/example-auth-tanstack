@@ -1,6 +1,11 @@
 // noinspection JSUnusedGlobalSymbols
-import { Link, Outlet, createRootRoute } from '@tanstack/react-router';
-import { Meta, Scripts } from '@tanstack/react-start';
+import {
+  HeadContent,
+  Link,
+  Outlet,
+  Scripts,
+  createRootRoute,
+} from '@tanstack/react-router';
 import React from 'react';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import '../app.css';
@@ -58,7 +63,7 @@ function RootComponent() {
   return (
     <html lang="en">
       <head>
-        <Meta />
+        <HeadContent />
       </head>
       <body className="flex min-h-screen flex-col bg-gray-50">
         <ErrorBoundary showDetails={import.meta.env.DEV}>

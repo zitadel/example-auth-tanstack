@@ -28,6 +28,10 @@ export default [
       '@typescript-eslint': ts.plugin,
     },
     rules: {
+      // Plain `no-unused-vars` triggers on TS function-type parameter names
+      // (e.g. `setHeader: (name: string) => void`). Defer to the TS-aware
+      // version instead.
+      'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': [
         'warn',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },

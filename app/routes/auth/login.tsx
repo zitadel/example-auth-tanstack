@@ -4,14 +4,17 @@ import { getMessage } from '~/lib/message';
 // noinspection JSUnusedGlobalSymbols
 export const Route = createFileRoute('/auth/login')({
   component: LoginPage,
-  validateSearch: (search: Record<string, unknown>) => ({
-    error: (search.error as string) ?? null,
-    callbackUrl: (search.callbackUrl as string) ?? null,
-  }),
+  // Deliberately no validateSearch: TanStack Router's search-param
+  // normalisation would redirect /auth/login → /auth/login?error=null&...
+  // and back in an infinite loop when validateSearch returns null-valued keys.
+  // Raw search params are read directly from the URL in the component instead.
 });
 
 function LoginPage() {
-  const { error, callbackUrl } = Route.useSearch();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const search = Route.useSearch() as Record<string, string | undefined>;
+  const error = search.error;
+  const callbackUrl = search.callbackUrl;
   const { message } = getMessage(error, 'signin-error');
 
   return (
