@@ -52,25 +52,7 @@ export async function buildLogoutUrl(
   return { url: urlObj.toString(), state };
 }
 
-declare module '@auth/core/types' {
-  interface Session {
-    idToken?: string;
-    accessToken?: string;
-    error?: string;
-  }
-}
-
-declare module '@auth/core/jwt' {
-  interface JWT {
-    idToken?: string;
-    accessToken?: string;
-    refreshToken?: string;
-    expiresAt?: number;
-    error?: string;
-  }
-}
-
-export const { handlers, getSession, signIn, signOut } = TanStackAuth({
+export const { handlers, getSession } = TanStackAuth({
   providers: [
     Zitadel({
       issuer: process.env.ZITADEL_DOMAIN!,

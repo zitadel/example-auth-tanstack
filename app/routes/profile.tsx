@@ -1,12 +1,12 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
-import type { Session } from '@auth/core/types';
 import { Header } from '~/components/Header';
 import { Footer } from '~/components/Footer';
+import { fetchSession } from '~/session';
 
 // noinspection JSUnusedGlobalSymbols
 export const Route = createFileRoute('/profile')({
-  beforeLoad: async ({ context }) => {
-    const session = context.session as Session | null;
+  loader: async () => {
+    const session = await fetchSession();
     if (!session) {
       throw redirect({ to: '/auth/login' });
     }
@@ -16,7 +16,7 @@ export const Route = createFileRoute('/profile')({
 });
 
 function ProfilePage() {
-  const { session } = Route.useRouteContext();
+  const { session } = Route.useLoaderData();
 
   return (
     <>

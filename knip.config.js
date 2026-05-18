@@ -10,9 +10,10 @@ module.exports = {
     'app/router.tsx',
     'app/client.tsx',
     'app/server.tsx',
-    'app.config.ts',
+    'app/session.ts',
+    'app/auth.server.ts',
     'app/routes/**/*',
     'app/lib/**/*',
   ],
-  ignore: ['commitlint.config.js', 'app.config.timestamp_*.js'],
+  ignore: ['commitlint.config.js', 'app/routeTree.gen.ts'],
 };
