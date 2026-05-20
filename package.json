@@ -1,5 +1,5 @@
 {
-  "name": "example-tanstack-start-auth",
+  "name": "example-tanstack-auth",
   "license": "Apache-2.0",
   "private": true,
   "type": "module",
@@ -24,7 +24,7 @@
     "@tanstack/react-router": "^1.168.0",
     "@tanstack/react-start": "^1.168.0",
     "@tanstack/start-storage-context": "^1.167.0",
-    "@zitadel/tanstack-auth": "file:../tanstack-start-auth",
+    "@zitadel/tanstack-auth": "file:../tanstack-auth",
     "openid-client": "^6.6.3",
     "react": "^19",
     "react-dom": "^19"
