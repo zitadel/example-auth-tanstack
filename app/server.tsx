@@ -60,7 +60,12 @@ async function handleRequest(request: Request): Promise<Response> {
     return new Response(null, { status: 405 });
   }
 
-  // GET /api/auth/logout/callback → clear authjs.* cookies, redirect to /
+  // GET /api/auth/logout/callback → clear authjs.* cookies + the
+  // path-scoped logout_state cookie, then redirect to the in-app
+  // logout success page. The logout_state cookie was set with
+  // Path=/api/auth/logout/callback when the RP-initiated logout flow
+  // started; the same Path attribute is required when clearing so
+  // the browser actually drops it.
   if (pathname === '/api/auth/logout/callback') {
     const cookieHeader = request.headers.get('Cookie') ?? '';
     const cookieNames = cookieHeader
@@ -69,10 +74,14 @@ async function handleRequest(request: Request): Promise<Response> {
       .map((c: string) => c.trim().split('=')[0].trim())
       .filter((name: string) => name.startsWith('authjs.'));
 
-    const responseHeaders = new Headers({ Location: '/' });
+    const responseHeaders = new Headers({ Location: '/logout/success' });
     for (const name of cookieNames) {
       responseHeaders.append('Set-Cookie', `${name}=; Max-Age=0; Path=/`);
     }
+    responseHeaders.append(
+      'Set-Cookie',
+      'logout_state=; Max-Age=0; Path=/api/auth/logout/callback',
+    );
     return withCookiesFixed(
       request,
       new Response(null, { status: 302, headers: responseHeaders }),
