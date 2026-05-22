@@ -4,7 +4,7 @@ import {
   defaultStreamHandler,
 } from '@tanstack/react-start/server';
 import { createServerEntry } from '@tanstack/react-start/server-entry';
-import { handlers, getSession } from './auth.server';
+import { handlers, getSession, buildLogoutUrl } from './auth.server';
 
 const tanstackHandler = createStartHandler(defaultStreamHandler);
 
@@ -55,9 +55,30 @@ async function handleRequest(request: Request): Promise<Response> {
   const url = new URL(request.url);
   const { pathname } = url;
 
-  // POST /api/auth/logout → stub 405 (back-channel logout not implemented)
+  // POST /api/auth/logout → initiate the RP-initiated logout flow
+  // against the IdP. Mirrors the implementation in the other seven
+  // examples: load the session for the id_token_hint, generate a
+  // state, store it in a Path-scoped logout_state cookie, then
+  // redirect to Zitadel's end_session_endpoint. The /logout/callback
+  // handler below validates the state on return.
   if (pathname === '/api/auth/logout') {
-    return new Response(null, { status: 405 });
+    if (request.method !== 'POST') {
+      return new Response(null, { status: 405, headers: { Allow: 'POST' } });
+    }
+    const session = await getSession(request);
+    if (!session?.idToken) {
+      return new Response('No valid session or ID token found', {
+        status: 400,
+      });
+    }
+    const { url: idpLogoutUrl, state } = await buildLogoutUrl(session.idToken);
+    return new Response(null, {
+      status: 302,
+      headers: {
+        Location: idpLogoutUrl,
+        'Set-Cookie': `logout_state=${state}; HttpOnly; SameSite=Lax; Path=/api/auth/logout/callback`,
+      },
+    });
   }
 
   // GET /api/auth/logout/callback → validate state then clear authjs.*
