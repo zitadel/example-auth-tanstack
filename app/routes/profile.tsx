@@ -2,13 +2,14 @@ import { createFileRoute, redirect } from '@tanstack/react-router';
 import { Header } from '~/components/Header';
 import { Footer } from '~/components/Footer';
 import { fetchSession } from '~/session';
+import { signInUrl } from '~/auth.server';
 
 // noinspection JSUnusedGlobalSymbols
 export const Route = createFileRoute('/profile')({
   loader: async () => {
     const session = await fetchSession();
     if (!session) {
-      throw redirect({ to: '/auth/login' });
+      throw redirect({ href: signInUrl({ redirectTo: '/profile' }) });
     }
     return { session };
   },

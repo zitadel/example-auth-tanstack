@@ -52,7 +52,7 @@ export async function buildLogoutUrl(
   return { url: urlObj.toString(), state };
 }
 
-export const { handlers, getSession } = TanStackAuth({
+export const { handlers, getSession, signInUrl, signOutUrl } = TanStackAuth({
   providers: [
     Zitadel({
       issuer: process.env.ZITADEL_DOMAIN!,
