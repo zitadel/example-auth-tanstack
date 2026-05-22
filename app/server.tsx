@@ -60,32 +60,57 @@ async function handleRequest(request: Request): Promise<Response> {
     return new Response(null, { status: 405 });
   }
 
-  // GET /api/auth/logout/callback → clear authjs.* cookies + the
-  // path-scoped logout_state cookie, then redirect to the in-app
-  // logout success page. The logout_state cookie was set with
-  // Path=/api/auth/logout/callback when the RP-initiated logout flow
-  // started; the same Path attribute is required when clearing so
-  // the browser actually drops it.
+  // GET /api/auth/logout/callback → validate state then clear authjs.*
+  // cookies + the path-scoped logout_state cookie. The logout_state
+  // cookie was set with Path=/api/auth/logout/callback when the
+  // RP-initiated logout flow started; the same Path attribute is
+  // required when clearing so the browser actually drops it.
+  //
+  // Validates the `state` query parameter against the `logout_state`
+  // cookie before clearing cookies, mirroring the pattern used by the
+  // other seven example apps. This prevents an attacker from triggering
+  // an unwanted logout via a crafted /api/auth/logout/callback link.
   if (pathname === '/api/auth/logout/callback') {
+    const state = url.searchParams.get('state');
     const cookieHeader = request.headers.get('Cookie') ?? '';
-    const cookieNames = cookieHeader
-      .split(';')
-      .filter(Boolean)
-      .map((c: string) => c.trim().split('=')[0].trim())
-      .filter((name: string) => name.startsWith('authjs.'));
+    const cookies = Object.fromEntries(
+      cookieHeader
+        .split(';')
+        .filter(Boolean)
+        .map((c: string) => {
+          const [k, ...v] = c.trim().split('=');
+          return [k.trim(), v.join('=')];
+        }),
+    );
+    const logoutStateCookie = cookies['logout_state'];
 
-    const responseHeaders = new Headers({ Location: '/logout/success' });
-    for (const name of cookieNames) {
-      responseHeaders.append('Set-Cookie', `${name}=; Max-Age=0; Path=/`);
+    if (state && logoutStateCookie && state === logoutStateCookie) {
+      const responseHeaders = new Headers({ Location: '/logout/success' });
+      responseHeaders.append('Clear-Site-Data', '"cookies"');
+      responseHeaders.append(
+        'Set-Cookie',
+        'logout_state=; Max-Age=0; HttpOnly; SameSite=Lax; Path=/api/auth/logout/callback',
+      );
+      for (const name of Object.keys(cookies)) {
+        if (name.includes('authjs.')) {
+          responseHeaders.append('Set-Cookie', `${name}=; Max-Age=0; Path=/`);
+        }
+      }
+      return withCookiesFixed(
+        request,
+        new Response(null, { status: 302, headers: responseHeaders }),
+      );
+    } else {
+      const errorUrl = new URL('/logout/error', url);
+      errorUrl.searchParams.set(
+        'reason',
+        'Invalid or missing state parameter.',
+      );
+      return new Response(null, {
+        status: 302,
+        headers: { Location: errorUrl.pathname + errorUrl.search },
+      });
     }
-    responseHeaders.append(
-      'Set-Cookie',
-      'logout_state=; Max-Age=0; Path=/api/auth/logout/callback',
-    );
-    return withCookiesFixed(
-      request,
-      new Response(null, { status: 302, headers: responseHeaders }),
-    );
   }
 
   // All other /api/auth/* routes → Auth.js
