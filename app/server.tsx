@@ -72,11 +72,16 @@ async function handleRequest(request: Request): Promise<Response> {
       });
     }
     const { url: idpLogoutUrl, state } = await buildLogoutUrl(session.idToken);
+    // The Secure flag must be conditional on environment: setting it in
+    // dev (HTTP) causes the browser to drop the cookie and silently
+    // breaks the CSRF state round-trip on the callback. In production
+    // (HTTPS) it should always be set.
+    const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
     return new Response(null, {
       status: 302,
       headers: {
         Location: idpLogoutUrl,
-        'Set-Cookie': `logout_state=${state}; HttpOnly; SameSite=Lax; Path=/api/auth/logout/callback`,
+        'Set-Cookie': `logout_state=${state}; HttpOnly; SameSite=Lax; Path=/api/auth/logout/callback${secure}`,
       },
     });
   }
