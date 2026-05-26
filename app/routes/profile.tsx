@@ -2,14 +2,20 @@ import { createFileRoute, redirect } from '@tanstack/react-router';
 import { Header } from '~/components/Header';
 import { Footer } from '~/components/Footer';
 import { fetchSession } from '~/session';
-import { signInUrl } from '~/auth.server';
 
 // noinspection JSUnusedGlobalSymbols
 export const Route = createFileRoute('/profile')({
   loader: async () => {
     const session = await fetchSession();
     if (!session) {
-      throw redirect({ href: signInUrl({ redirectTo: '/profile' }) });
+      // Redirect to the configured sign-in page directly. Importing
+      // signInUrl from ~/auth.server would pull @auth/core into the
+      // client bundle (and trip tanstack-start's `**/*.server.*`
+      // import-protection), so we use the route-relative URL instead.
+      throw redirect({
+        to: '/auth/login',
+        search: { callbackUrl: '/profile' },
+      });
     }
     return { session };
   },
