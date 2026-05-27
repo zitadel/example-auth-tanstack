@@ -22,7 +22,7 @@ interface AuthProvider {
 function LoginPage() {
   const search = Route.useSearch() as Record<string, string | undefined>;
   const error = search.error;
-  const callbackUrl = search.callbackUrl ?? '/';
+  const callbackUrl = search.callbackUrl ?? '/profile';
   const { message } = getMessage(error, 'signin-error');
 
   const [csrfToken, setCsrfToken] = useState('');

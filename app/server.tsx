@@ -181,18 +181,6 @@ async function handleRequest(request: Request): Promise<Response> {
     }
   }
 
-  // Public API endpoint — no authentication required.
-  if (pathname === '/api/unprotected') {
-    return Response.json({ ok: true });
-  }
-
-  // Session-protected API endpoints — return 403 when unauthenticated.
-  if (pathname === '/api/secured' || pathname === '/api/protected/middleware') {
-    const session = await getSession(request);
-    if (!session) return Response.json({ error: 'Forbidden' }, { status: 403 });
-    return Response.json({ ok: true });
-  }
-
   // Everything else → TanStack Start SSR router
   return tanstackHandler(request);
 }
