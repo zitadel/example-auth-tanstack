@@ -1,11 +1,5 @@
 module.exports = {
-  ignoreDependencies: [
-    '@commitlint/config-conventional',
-    '@zitadel/tanstack-auth',
-  ],
-  rules: {
-    unresolved: 'off',
-  },
+  ignoreDependencies: ['@commitlint/config-conventional'],
   entry: [
     'app/router.tsx',
     'app/client.tsx',
