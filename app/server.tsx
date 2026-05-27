@@ -147,6 +147,40 @@ async function handleRequest(request: Request): Promise<Response> {
       return withCookiesFixed(request, await handlers.POST({ request }));
   }
 
+  // GET /api/userinfo → proxy to Zitadel's OIDC userinfo endpoint using the
+  // user's access token. Demonstrates how to call Zitadel APIs from the app
+  // server. The session's JWT carries a login-time snapshot; this hits the
+  // live endpoint so callers see current roles, metadata, etc.
+  if (pathname === '/api/userinfo') {
+    if (request.method !== 'GET') {
+      return new Response(null, { status: 405, headers: { Allow: 'GET' } });
+    }
+    const session = await getSession(request);
+    if (!session?.accessToken) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    try {
+      const upstream = await fetch(
+        `${process.env.ZITADEL_DOMAIN}/oidc/v1/userinfo`,
+        {
+          headers: { Authorization: `Bearer ${session.accessToken}` },
+        },
+      );
+      if (!upstream.ok) {
+        // noinspection ExceptionCaughtLocallyJS
+        throw new Error(`UserInfo API error: ${upstream.status}`);
+      }
+      const userInfo = await upstream.json();
+      return Response.json(userInfo);
+    } catch (error) {
+      console.error('UserInfo fetch failed:', error);
+      return Response.json(
+        { error: 'Failed to fetch user info' },
+        { status: 500 },
+      );
+    }
+  }
+
   // Public API endpoint — no authentication required.
   if (pathname === '/api/unprotected') {
     return Response.json({ ok: true });
