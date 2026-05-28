@@ -20,7 +20,7 @@
     "test": "playwright test"
   },
   "dependencies": {
-    "@auth/core": "^0.41.0",
+    "@auth/core": "^0.40.0",
     "@tanstack/react-router": "^1.168.0",
     "@tanstack/react-start": "^1.168.0",
     "@tanstack/start-storage-context": "^1.167.0",
