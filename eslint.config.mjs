@@ -1,0 +1,42 @@
+import js from '@eslint/js';
+import ts from 'typescript-eslint';
+import prettier from 'eslint-config-prettier';
+import globals from 'globals';
+
+export default [
+  {
+    ignores: ['.vinxi/**', 'dist/**', 'node_modules/**'],
+  },
+  js.configs.recommended,
+  {
+    files: ['**/*.js'],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
+  {
+    files: ['**/*.{ts,tsx}'],
+    ...ts.configs.recommended[0],
+    languageOptions: {
+      parser: ts.parser,
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+    },
+    plugins: {
+      '@typescript-eslint': ts.plugin,
+    },
+    rules: {
+      // Plain `no-unused-vars` triggers on TS function-type parameter names
+      // (e.g. `setHeader: (name: string) => void`). Defer to the TS-aware
+      // version instead.
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+    },
+  },
+  prettier,
+];
