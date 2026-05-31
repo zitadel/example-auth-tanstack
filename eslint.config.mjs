@@ -3,34 +3,27 @@ import ts from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';
 import globals from 'globals';
 
-export default [
+export default ts.config(
   {
-    ignores: ['.vinxi/**', 'dist/**', 'node_modules/**'],
+    ignores: [
+      'node_modules/**',
+      'dist/**',
+      'build/**',
+      'coverage/**',
+      '.vinxi/**',
+      '.output/**',
+    ],
   },
   js.configs.recommended,
-  {
-    files: ['**/*.js'],
-    languageOptions: {
-      globals: globals.node,
-    },
-  },
+  ...ts.configs.recommended,
   {
     files: ['**/*.{ts,tsx}'],
-    ...ts.configs.recommended[0],
     languageOptions: {
       parser: ts.parser,
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-      },
-    },
-    plugins: {
-      '@typescript-eslint': ts.plugin,
+      parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
+      globals: { ...globals.browser, ...globals.node, ...globals.es2021 },
     },
     rules: {
-      // Plain `no-unused-vars` triggers on TS function-type parameter names
-      // (e.g. `setHeader: (name: string) => void`). Defer to the TS-aware
-      // version instead.
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': [
         'warn',
@@ -38,5 +31,15 @@ export default [
       ],
     },
   },
+  {
+    files: ['**/*.{js,mjs}'],
+    languageOptions: {
+      globals: { ...globals.node, ...globals.es2021 },
+    },
+  },
+  {
+    files: ['**/*.{test,spec}.{ts,tsx,js,mjs}', 'test/**/*.{ts,tsx,js,mjs}'],
+    languageOptions: { globals: { ...globals.jest, ...globals.node } },
+  },
   prettier,
-];
+);
